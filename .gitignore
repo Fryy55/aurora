@@ -1,0 +1,8 @@
+# ILY vscode
+*.code-workspace
+
+# clangd :p
+.cache/
+
+# cmake
+build/
