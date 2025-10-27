@@ -1,6 +1,8 @@
 #pragma once
 
-#include <unordered_set>
+#include <aurora/singletons/TargetManager.hpp>
+
+#include <iostream>
 #include <print>
 #include <regex>
 #include <fstream>
@@ -54,19 +56,16 @@ private:
 	static std::uint8_t s_maxSourceLength;
 
 public:
-	// Extra targets
-	using Targets = std::unordered_set<std::string>;
-	[[nodiscard]] static Targets const& getLogTargets() noexcept { return s_logTargets; }
-	static bool addLogTarget(std::string_view pathToAFile) noexcept;
-	static bool removeLogTarget(std::string_view pathToAFile) noexcept;
-	static void clearLogTargets() noexcept;
+	// Log to stderr
+	[[nodiscard]] static bool getLogToStderrEnabled() noexcept { return s_logToStderr; }
+	static void setLogToStderrEnabled(bool on) noexcept { s_logToStderr = on; }
 
 private:
-	static Targets s_logTargets;
+	static bool s_logToStderr;
 
 
+// Logging functions
 private:
-	// Logging functions
 	using LogStates = std::pair<bool, bool>;
 
 public:
@@ -133,13 +132,13 @@ private:
 		);
 
 		if (states.first)
-			std::print("{}", string);
+			std::print(s_logToStderr ? std::cerr : std::cout, "{}", string);
 		if (states.second) {
 			static std::regex const ansiRegex(R"(\x1B\[[\d;]*m)");
 
 			auto fileString = std::regex_replace(string, ansiRegex, "");
 
-			for (auto const& filename : s_logTargets) {
+			for (auto const& filename : TargetManager::get()->getLogTargets()) {
 				std::ofstream F(filename, std::ios::app);
 				F << fileString;
 				F.close();

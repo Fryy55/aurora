@@ -26,9 +26,10 @@ int main() {
 	- ANSI supported logging to 4 different levels (`aurora::log::debug`, `aurora::log::info`, `aurora::log::warn`, `aurora::log::error`)
 	- Custom log source specification (e.g. `aurora::log::debug("[AURORA] Hello from Aurora!")` -> `...] DEBUG | [AURORA] | Hello from Aurora!`)
 	- An ability to configure some of the logging aspects
-	- Custom log targets (files)
 - `aurora::ThreadManager`
 	- An ability to add names to threads for better readability in logs
+- `aurora::TargetManager`
+	- Custom log targets (files)
 
 # Usage
 ## Installing
@@ -50,7 +51,7 @@ You can also use a specific tag/branch/commit of amber like this:
 ## Using
 Simply include headers (e.g. `#include <aurora/log.hpp>`) and use them in your projects!
 
-There is also a general "include everything" header (`<aurora/aurora.hpp>`).
+There is also a general "include everything" header (`<aurora/aurora.hpp>`), as well as grouped headers (e.g. `<aurora/singletons/singletons.hpp>`).
 
 # License
 This project is distributed under the **MIT License**.
