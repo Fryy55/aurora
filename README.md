@@ -9,17 +9,28 @@ A simple C++23 logger library, inspired by [Geode](https://github.com/geode-sdk/
 int main() {
 	using namespace aurora;
 
-	log::setLogLevel(log::LogLevel::Debug);
 	log::set12hTimeEnabled(true);
+	log::setFileLogLevel(log::LogLevel::Debug);
+
+	TargetManager::get()->logToDir(
+		std::format("{}/Desktop/some-dir", std::getenv("HOME")),
+		"Aurora"
+	);
+
 	ThreadManager::get()->addThread("Main");
 
-	log::debug("haii");
+	log::debug("[Cool Project] haii from Cool Project!");
+	log::info("[Project with a very long name] haii from Project with a very long name!");
+	log::warn("haii!");
+	log::error("haii!");
 
 	return 0;
 }
 ```
-![Logging preview](.github/images/logging-preview.png)
-
+![Console Preview](.github/images/console-preview.png)
+![File Preview](.github/images/file-preview.png)
+> [!NOTE]
+> File logs may not be colored depending your text editor!
 
 # Features
 - `aurora::log`
@@ -28,7 +39,7 @@ int main() {
 	- An ability to configure some of the logging aspects
 - `aurora::ThreadManager`
 	- An ability to add names to threads for better readability in logs
-- `aurora::TargetManager`
+- `aurora::TargetManager` **(NOTE: on some systems Aurora's file access failure reasons may not be accurate!)**
 	- Custom log targets (files)
 	- Automatic per-directory log management
 
