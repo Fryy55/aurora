@@ -3,6 +3,7 @@
 #include <aurora/log.hpp>
 
 #include <fstream>
+#include <cstring>
 
 using namespace aurora;
 
@@ -19,8 +20,8 @@ bool TargetManager::addLogTarget(std::string_view pathToAFile) noexcept {
 	std::ofstream F(pathToAFileStr);
 	if (!F.is_open()) {
 		log::warn(
-			"[AURORA] Failed to add log target '{}'; target isn't a file name.",
-			pathToAFile
+			"[AURORA] Failed to add log target '{}': {}.",
+			pathToAFile, std::strerror(errno)
 		);
 		return false;
 	}

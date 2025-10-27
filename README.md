@@ -30,6 +30,7 @@ int main() {
 	- An ability to add names to threads for better readability in logs
 - `aurora::TargetManager`
 	- Custom log targets (files)
+	- Automatic per-directory log management
 
 # Usage
 ## Installing
