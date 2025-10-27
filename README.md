@@ -30,7 +30,7 @@ int main() {
 ![Console Preview](.github/images/console-preview.png)
 ![File Preview](.github/images/file-preview.png)
 > [!NOTE]
-> File logs may not be colored depending your text editor!
+> File logs may not be colored depending on your text editor!
 
 # Features
 - `aurora::log`
