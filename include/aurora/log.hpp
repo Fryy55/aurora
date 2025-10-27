@@ -44,6 +44,16 @@ private:
 	static bool s_use12hTime;
 
 public:
+	// Max source length
+	[[nodiscard]] static std::uint8_t getMaxSourceLength() noexcept { return s_maxSourceLength; }
+	static void setMaxSourceLength(std::uint8_t maxSourceLength) noexcept {
+		s_maxSourceLength = maxSourceLength;
+	}
+
+private:
+	static std::uint8_t s_maxSourceLength;
+
+public:
 	// Extra targets
 	using Targets = std::unordered_set<std::string>;
 	[[nodiscard]] static Targets const& getLogTargets() noexcept { return s_logTargets; }
@@ -125,7 +135,7 @@ private:
 		if (states.first)
 			std::print("{}", string);
 		if (states.second) {
-			static std::regex const ansiRegex(R"(\x1B\[[0-9;]*m)");
+			static std::regex const ansiRegex(R"(\x1B\[[\d;]*m)");
 
 			auto fileString = std::regex_replace(string, ansiRegex, "");
 
@@ -138,10 +148,12 @@ private:
 
 		return;
 	}
+
 	static std::string logString(
 		LogLevel logLevel,
 		std::string&& formattedBody
 	) noexcept;
+	static std::string&& limitStr(std::string&& str) noexcept;
 };
 
 } // namespace aurora

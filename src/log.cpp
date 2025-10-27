@@ -12,6 +12,8 @@ auto log::s_logLevel = log::LogLevel::Debug;
 auto log::s_fileLogLevel = log::LogLevel::Info;
 // Time locale
 auto log::s_use12hTime = false;
+// Max source length
+std::uint8_t log::s_maxSourceLength = 12u;
 // Extra targets
 log::Targets log::s_logTargets{};
 
@@ -102,7 +104,7 @@ std::string log::logString(
 
 	// check for a source
 	bool source = false;
-	static std::regex const sourceRegex(R"(^(\[.*\]) (.*))");
+	static std::regex const sourceRegex(R"(^\[(.*?)\] (.*))");
 	std::smatch matches;
 
 	if (std::regex_search(formattedBody, matches, sourceRegex))
@@ -137,7 +139,7 @@ std::string log::logString(
 			auto thID = std::this_thread::get_id();
 
 			return std::string(ThreadManager::get()->getThreadNameByID(thID).value_or(
-				std::format("Thread {}", thID))
+				limitStr(std::format("Thread {}", thID)))
 			);
 		}(),
 		hTag, // h tag
@@ -160,7 +162,7 @@ std::string log::logString(
 			}
 		}(),
 		source ? // optional source specifier
-			std::format("\e[0;36m {}\e[90m |", matches[1].str())
+			std::format("\e[0;36m [{}]\e[90m |", limitStr(matches[1].str()))
 			:
 			"",
 		[logLevel]() { // b tag
@@ -182,4 +184,11 @@ std::string log::logString(
 			:
 			formattedBody
 	);
+}
+
+std::string&& log::limitStr(std::string&& str) noexcept {
+	if (str.size() > s_maxSourceLength)
+		str = str.substr(0, s_maxSourceLength).append(">");
+
+	return str;
 }
