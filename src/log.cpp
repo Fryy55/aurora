@@ -101,14 +101,12 @@ std::string log::logString(
 	}
 
 	// check for a source
-	std::optional<std::string> source = std::nullopt;
+	bool source = false;
 	static std::regex const sourceRegex(R"(^(\[.*\]) (.*))");
 	std::smatch matches;
 
-	if (std::regex_search(formattedBody, matches, sourceRegex)) {
-		source = matches[1];
-		formattedBody = matches[2];
-	}
+	if (std::regex_search(formattedBody, matches, sourceRegex))
+		source = true;
 
 	return std::format(
 		"{}" // h tag
@@ -162,7 +160,7 @@ std::string log::logString(
 			}
 		}(),
 		source ? // optional source specifier
-			std::format("\e[0;36m {}\e[90m |", source.value())
+			std::format("\e[0;36m {}\e[90m |", matches[1].str())
 			:
 			"",
 		[logLevel]() { // b tag
@@ -179,6 +177,9 @@ std::string log::logString(
 					return "\e[0m";
 			}
 		}(),
-		formattedBody // body
+		source ? // body
+			matches[2].str()
+			:
+			formattedBody
 	);
 }
