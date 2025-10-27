@@ -23,7 +23,8 @@ int main() {
 
 # Features
 - `aurora::log`
-	- Logging to 4 different levels (`aurora::log::debug`, `aurora::log::info`, `aurora::log::warn`, `aurora::log::error`)
+	- ANSI supported logging to 4 different levels (`aurora::log::debug`, `aurora::log::info`, `aurora::log::warn`, `aurora::log::error`)
+	- Custom log source specification (e.g. `aurora::log::debug("[AURORA] Hello from Aurora!")` -> `...] DEBUG | [AURORA] | Hello from Aurora!`)
 	- An ability to configure some of the logging aspects
 	- Custom log targets (files)
 - `aurora::ThreadManager`

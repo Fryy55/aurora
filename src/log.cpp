@@ -8,12 +8,75 @@ using namespace aurora;
 
 
 // Log level
-auto log::s_logLevel = log::LogLevel::Info;
+auto log::s_logLevel = log::LogLevel::Debug;
+auto log::s_fileLogLevel = log::LogLevel::Info;
 // Time locale
 auto log::s_use12hTime = false;
+// Extra targets
+log::Targets log::s_logTargets{};
 
 
-std::string log::logString(log::LogLevel logLevel) noexcept {
+bool log::addLogTarget(std::string_view pathToAFile) noexcept {
+	std::string pathToAFileStr(pathToAFile);
+	std::ofstream F(pathToAFileStr);
+	if (!F.is_open()) {
+		log::warn(
+			"[AURORA] Failed to add log target '{}'; target isn't a file name.",
+			pathToAFile
+		);
+		return false;
+	}
+	F.close();
+	(void)std::remove(pathToAFileStr.c_str());
+
+	auto [iter, inserted] = s_logTargets.emplace(pathToAFile);
+	if (!inserted) {
+		log::warn(
+			"[AURORA] Failed to add log target '{}'; target already exists.",
+			pathToAFile
+		);
+		return false;
+	}
+
+	log::debug("[AURORA] Log target '{}' added.", pathToAFile);
+
+	return true;
+}
+
+bool log::removeLogTarget(std::string_view pathToAFile) noexcept {
+	std::string pathToAFileStr(pathToAFile);
+
+	if (!s_logTargets.contains(pathToAFileStr)) {
+		log::warn(
+			"[AURORA] Failed to remove log target '{}'; target doesn't exist.",
+			pathToAFile
+		);
+		return false;
+	}
+
+	s_logTargets.erase(pathToAFileStr);
+
+	log::debug(
+		"[AURORA] Log target '{}' removed.",
+		pathToAFile
+	);
+
+	return true;
+}
+
+void log::clearLogTargets() noexcept {
+	s_logTargets.clear();
+
+	log::debug("[AURORA] Log targets reset.");
+
+	return;
+}
+
+
+std::string log::logString(
+	log::LogLevel logLevel,
+	std::string&& formattedBody
+) noexcept {
 	char const* hTag;
 	switch (logLevel) {
 		case LogLevel::Debug:
@@ -37,6 +100,16 @@ std::string log::logString(log::LogLevel logLevel) noexcept {
 			break;
 	}
 
+	// check for a source
+	std::optional<std::string> source = std::nullopt;
+	static std::regex const sourceRegex(R"(^(\[.*\]) (.*))");
+	std::smatch matches;
+
+	if (std::regex_search(formattedBody, matches, sourceRegex)) {
+		source = matches[1];
+		formattedBody = matches[2];
+	}
+
 	return std::format(
 		"{}" // h tag
 		"{}" // time
@@ -45,8 +118,9 @@ std::string log::logString(log::LogLevel logLevel) noexcept {
 		" {}" // h tag
 		"{}" // log level
 		"\e[90m |" // separator
+		"{}" // optional source specifier
 		"{}" // b tag
-		" {{}}" // body
+		" {}" // body
 		"\e[0m" // reset tag
 		"\n", // newline
 
@@ -87,6 +161,10 @@ std::string log::logString(log::LogLevel logLevel) noexcept {
 					return "BLANK";
 			}
 		}(),
+		source ? // optional source specifier
+			std::format("\e[0;36m {}\e[90m |", source.value())
+			:
+			"",
 		[logLevel]() { // b tag
 			switch (logLevel) {
 				case LogLevel::Warn:
@@ -100,6 +178,7 @@ std::string log::logString(log::LogLevel logLevel) noexcept {
 				default:
 					return "\e[0m";
 			}
-		}()
+		}(),
+		formattedBody // body
 	);
 }

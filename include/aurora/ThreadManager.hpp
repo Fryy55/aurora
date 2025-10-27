@@ -21,10 +21,10 @@ private:
 	~ThreadManager() = default;
 
 public:
-	void addThread(std::string_view threadName) noexcept;
-	void removeThread(std::thread::id id) noexcept;
-	void removeThread(std::string_view threadName) noexcept;
-	void resetDB() noexcept;
+	bool addThread(std::string_view threadName) noexcept;
+	bool removeThread(std::thread::id id) noexcept;
+	bool removeThread(std::string_view threadName) noexcept;
+	void clearDB() noexcept;
 	[[nodiscard]] std::optional<std::string_view> getThreadNameByID(std::thread::id id) const noexcept;
 	[[nodiscard]] std::optional<std::thread::id> getThreadIDByName(std::string_view threadName) const noexcept;
 

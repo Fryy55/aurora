@@ -29,6 +29,7 @@ if (DEFINED AURORA_USE_NAMESPACE)
 else()
     message(STATUS "AURORA_USE_NAMESPACE not set. Not using the namespace.")
 endif()
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${AURORA_INCLUDE_DIR}

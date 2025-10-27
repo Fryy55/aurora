@@ -12,14 +12,14 @@ ThreadManager* ThreadManager::get() noexcept {
 }
 
 
-void ThreadManager::addThread(std::string_view threadName) noexcept {
+bool ThreadManager::addThread(std::string_view threadName) noexcept {
 	auto [iter, inserted] = m_strDB.emplace(threadName);
 	if (!inserted) {
 		log::warn(
-			"Failed to name thread {}; thread named '{}' already exists.",
+			"[AURORA] Failed to name thread {}; thread named '{}' already exists.",
 			std::this_thread::get_id(), threadName
 		);
-		return;
+		return false;
 	}
 
 	auto id = std::this_thread::get_id();
@@ -27,18 +27,18 @@ void ThreadManager::addThread(std::string_view threadName) noexcept {
 	m_dbID_S.emplace(id, *iter);
 	m_dbS_ID.emplace(*iter, id);
 
-	log::debug("Thread {} saved as '{}'.", id, threadName);
+	log::debug("[AURORA] Thread {} saved as '{}'.", id, threadName);
 
-	return;
+	return true;
 }
 
-void ThreadManager::removeThread(std::thread::id id) noexcept {
+bool ThreadManager::removeThread(std::thread::id id) noexcept {
 	if (!m_dbID_S.contains(id)) {
 		log::warn(
-			"Failed to remove thread {}; thread doesn't exist.",
+			"[AURORA] Failed to remove thread {}; thread doesn't exist.",
 			id
 		);
-		return;
+		return false;
 	}
 
 	auto str = std::string(m_dbID_S[id]);
@@ -49,20 +49,20 @@ void ThreadManager::removeThread(std::thread::id id) noexcept {
 	m_strDB.erase(str);
 
 	log::debug(
-		"Thread '{}' ({}) removed.",
+		"[AURORA] Thread '{}' ({}) removed.",
 		str, id
 	);
 
-	return;
+	return true;
 }
 
-void ThreadManager::removeThread(std::string_view str) noexcept {
+bool ThreadManager::removeThread(std::string_view str) noexcept {
 	if (!m_dbS_ID.contains(str)) {
 		log::warn(
-			"Failed to remove thread '{}'; thread doesn't exist.",
+			"[AURORA] Failed to remove thread '{}'; thread doesn't exist.",
 			str
 		);
-		return;
+		return false;
 	}
 
 	auto id = m_dbS_ID[str];
@@ -73,20 +73,20 @@ void ThreadManager::removeThread(std::string_view str) noexcept {
 	m_strDB.erase(std::string(str));
 
 	log::debug(
-		"Thread '{}' ({}) removed.",
+		"[AURORA] Thread '{}' ({}) removed.",
 		str, id
 	);
 
-	return;
+	return true;
 }
 
-void ThreadManager::resetDB() noexcept {
+void ThreadManager::clearDB() noexcept {
 	m_dbID_S.clear();
 	m_dbS_ID.clear();
 
 	m_strDB.clear();
 
-	log::debug("Thread name databases reset.");
+	log::debug("[AURORA] Thread name databases reset.");
 
 	return;
 }
