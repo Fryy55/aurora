@@ -10,6 +10,11 @@
 
 namespace aurora {
 
+/**
+ * @brief Main logging class.
+ * Includes logging functions and configs
+ * 
+ */
 class log final {
 public:
 	// ..............
@@ -21,6 +26,10 @@ public:
 	~log() = delete;
 
 	// Log level
+	/**
+	 * @brief An enum, containing all available log levels
+	 * 
+	 */
 	enum class LogLevel : std::uint8_t {
 		Debug,
 		Info,
@@ -28,9 +37,29 @@ public:
 		Error
 	};
 
+	/**
+	 * @brief Gets logging level for console output. `LogLevel::Debug` by default
+	 * 
+	 * @return Logging level
+	 */
 	[[nodiscard]] static LogLevel getLogLevel() noexcept { return s_logLevel; }
+	/**
+	 * @brief Sets logging level for console output. `LogLevel::Debug` by default
+	 * 
+	 * @param logLevel Logging level
+	 */
 	static void setLogLevel(LogLevel logLevel) noexcept { s_logLevel = logLevel; }
+	/**
+	 * @brief Gets logging level for file output. `LogLevel::Info` by default
+	 * 
+	 * @return Logging level
+	 */
 	[[nodiscard]] static LogLevel getFileLogLevel() noexcept { return s_fileLogLevel; }
+	/**
+	 * @brief Sets logging level for file output. `LogLevel::Info` by default
+	 * 
+	 * @param logLevel Logging level
+	 */
 	static void setFileLogLevel(LogLevel logLevel) noexcept { s_fileLogLevel = logLevel; }
 
 private:
@@ -39,7 +68,17 @@ private:
 
 public:
 	// Time locale
+	/**
+	 * @brief Gets 12h time formatting setting. `false` by default
+	 * 
+	 * @return Current value
+	 */
 	[[nodiscard]] static bool get12hTimeEnabled() noexcept { return s_use12hTime; }
+	/**
+	 * @brief Sets 12h time formatting setting. `false` by default
+	 * 
+	 * @param on Value to set
+	 */
 	static void set12hTimeEnabled(bool on) noexcept { s_use12hTime = on; }
 
 private:
@@ -47,7 +86,17 @@ private:
 
 public:
 	// Max source length
+	/**
+	 * @brief Gets maximum source specifier/thread name length. `12` by default
+	 * 
+	 * @return Current value
+	 */
 	[[nodiscard]] static std::uint8_t getMaxSourceLength() noexcept { return s_maxSourceLength; }
+	/**
+	 * @brief Sets maximum source specifier/thread name length. `12` by default
+	 * 
+	 * @param maxSourceLength Value to set
+	 */
 	static void setMaxSourceLength(std::uint8_t maxSourceLength) noexcept {
 		s_maxSourceLength = maxSourceLength;
 	}
@@ -57,7 +106,18 @@ private:
 
 public:
 	// Log to stderr
+	/**
+	 * @brief Gets the current console log target stream. `true` by default
+	 * 
+	 * @return true Aurora will log to `stderr`
+	 * @return false Aurora will log to `stdout`
+	 */
 	[[nodiscard]] static bool getLogToStderrEnabled() noexcept { return s_logToStderr; }
+	/**
+	 * @brief Sets the current console log target stream. `true` by default
+	 * 
+	 * @param on Value to set. `true` will log to `stderr`; `false` will log to `stdout`
+	 */
 	static void setLogToStderrEnabled(bool on) noexcept { s_logToStderr = on; }
 
 private:
@@ -69,6 +129,12 @@ private:
 	using LogStates = std::pair<bool, bool>;
 
 public:
+	/**
+	 * @brief Logs with at the debug level
+	 * 
+	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
+	 * @param args Args to format with. Should match the number of fields in @p formatString
+	 */
 	template <typename ...Args>
 	static void debug(std::format_string<Args...> formatString, Args&&... args) noexcept {
 		LogStates states{};
@@ -83,6 +149,12 @@ public:
 
 		return;
 	}
+	/**
+	 * @brief Logs with at the info level
+	 * 
+	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
+	 * @param args Args to format with. Should match the number of fields in @p formatString
+	 */
 	template <typename ...Args>
 	static void info(std::format_string<Args...> formatString, Args&&... args) noexcept {
 		LogStates states{};
@@ -97,6 +169,12 @@ public:
 
 		return;
 	}
+	/**
+	 * @brief Logs with at the warn level
+	 * 
+	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
+	 * @param args Args to format with. Should match the number of fields in @p formatString
+	 */
 	template <typename ...Args>
 	static void warn(std::format_string<Args...> formatString, Args&&... args) noexcept {
 		LogStates states{};
@@ -111,6 +189,12 @@ public:
 
 		return;
 	}
+	/**
+	 * @brief Logs with at the error level
+	 * 
+	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
+	 * @param args Args to format with. Should match the number of fields in @p formatString
+	 */
 	template <typename ...Args>
 	static void error(std::format_string<Args...> formatString, Args&&... args) noexcept {
 		log_impl({ true, true }, LogLevel::Error, formatString, std::forward<Args>(args)...);
