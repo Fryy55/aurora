@@ -130,7 +130,7 @@ private:
 
 public:
 	/**
-	 * @brief Logs with at the debug level
+	 * @brief Logs at the debug level
 	 * 
 	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
 	 * @param args Args to format with. Should match the number of fields in @p formatString
@@ -150,7 +150,7 @@ public:
 		return;
 	}
 	/**
-	 * @brief Logs with at the info level
+	 * @brief Logs at the info level
 	 * 
 	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
 	 * @param args Args to format with. Should match the number of fields in @p formatString
@@ -170,7 +170,7 @@ public:
 		return;
 	}
 	/**
-	 * @brief Logs with at the warn level
+	 * @brief Logs at the warn level
 	 * 
 	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
 	 * @param args Args to format with. Should match the number of fields in @p formatString
@@ -190,7 +190,7 @@ public:
 		return;
 	}
 	/**
-	 * @brief Logs with at the error level
+	 * @brief Logs at the error level
 	 * 
 	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
 	 * @param args Args to format with. Should match the number of fields in @p formatString
