@@ -49,7 +49,7 @@ Install [CPM](https://github.com/cpm-cmake/CPM.cmake) if you don't have it in yo
 
 ```cmake
 CPMAddPackage("gh:Fryy55/aurora@1.0.0")
-target_link_libraries(${PROJECT_NAME} aurora)
+target_link_libraries(${PROJECT_NAME} Aurora)
 ```
 Replace `1.0.0` with the version you want to use.
 
