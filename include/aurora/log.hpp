@@ -2,8 +2,8 @@
 
 #include <aurora/singletons/TargetManager.hpp>
 
-#include <iostream>
 #include <print>
+#include <iostream>
 #include <regex>
 #include <fstream>
 
@@ -127,6 +127,8 @@ private:
 // Logging functions
 private:
 	using LogStates = std::pair<bool, bool>;
+	static LogStates statesForLevel(LogLevel logLevel) noexcept;
+	#define IMPL_CHECK_STATES(_logLevel) if (auto states = statesForLevel((_logLevel)); states.first || states.second)
 
 public:
 	/**
@@ -136,16 +138,9 @@ public:
 	 * @param args Args to format with. Should match the number of fields in @p formatString
 	 */
 	template <typename ...Args>
-	static void debug(std::format_string<Args...> formatString, Args&&... args) noexcept {
-		LogStates states{};
-
-		if (s_logLevel == LogLevel::Debug)
-			states.first = true;
-		if (s_fileLogLevel == LogLevel::Debug)
-			states.second = true;
-
-		if (states.first || states.second)
-			log_impl(states, LogLevel::Debug, formatString, std::forward<Args>(args)...);
+	static void debug(std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+		IMPL_CHECK_STATES(LogLevel::Debug)
+			log_impl(std::nullopt, states, LogLevel::Debug, formatString, std::forward<Args>(args)...);
 
 		return;
 	}
@@ -156,16 +151,9 @@ public:
 	 * @param args Args to format with. Should match the number of fields in @p formatString
 	 */
 	template <typename ...Args>
-	static void info(std::format_string<Args...> formatString, Args&&... args) noexcept {
-		LogStates states{};
-
-		if (s_logLevel == LogLevel::Debug || s_logLevel == LogLevel::Info)
-			states.first = true;
-		if (s_fileLogLevel == LogLevel::Debug || s_fileLogLevel == LogLevel::Info)
-			states.second = true;
-
-		if (states.first || states.second)
-			log_impl(states, LogLevel::Info, formatString, std::forward<Args>(args)...);
+	static void info(std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+		IMPL_CHECK_STATES(LogLevel::Info)
+			log_impl(std::nullopt, states, LogLevel::Info, formatString, std::forward<Args>(args)...);
 
 		return;
 	}
@@ -176,16 +164,9 @@ public:
 	 * @param args Args to format with. Should match the number of fields in @p formatString
 	 */
 	template <typename ...Args>
-	static void warn(std::format_string<Args...> formatString, Args&&... args) noexcept {
-		LogStates states{};
-
-		if (s_logLevel != LogLevel::Error)
-			states.first = true;
-		if (s_fileLogLevel != LogLevel::Error)
-			states.second = true;
-
-		if (states.first || states.second)
-			log_impl(states, LogLevel::Warn, formatString, std::forward<Args>(args)...);
+	static void warn(std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+		IMPL_CHECK_STATES(LogLevel::Warn)
+			log_impl(std::nullopt, states, LogLevel::Warn, formatString, std::forward<Args>(args)...);
 
 		return;
 	}
@@ -196,21 +177,78 @@ public:
 	 * @param args Args to format with. Should match the number of fields in @p formatString
 	 */
 	template <typename ...Args>
-	static void error(std::format_string<Args...> formatString, Args&&... args) noexcept {
-		log_impl({ true, true }, LogLevel::Error, formatString, std::forward<Args>(args)...);
+	static void error(std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+		IMPL_CHECK_STATES(LogLevel::Error)
+			log_impl(std::nullopt, states, LogLevel::Error, formatString, std::forward<Args>(args)...);
+
+		return;
+	}
+
+	/**
+	 * @brief A configuration structure for customizing a log level
+	 * 
+	 */
+	struct CustomLogLevelConfig final {
+		using ANSITag = std::variant<LogLevel, std::string_view>;
+
+		/**
+		 * @brief Log level, which this log should follow
+		 *
+		 * @details For example, setting this to `LogLevel::Info` will log only when info logs are logged
+		 * 
+		 */
+		LogLevel logLevel;
+		/**
+		 * @brief The name of a custom log level (e.g. `TRACE`)
+		 *
+		 * @details Should preferably be 5 characters long for alignment with other levels, however this is not a hard limitation at all
+		 * 
+		 */
+		std::string_view logLevelName;
+		/**
+		 * @brief Head ANSI tag of the log that should be printed
+		 *
+		 * @details Can be either an enum of @ref aurora::log::LogLevel or a custom ANSI tag.
+		 * Custom tag strings are @em not parsed, so it can, in fact, be anything
+		 * 
+		 */
+		ANSITag headTag;
+		/**
+		 * @brief Body ANSI tag of the log that should be printed
+		 *
+		 * @details Can be either an enum of @ref aurora::log::LogLevel or a custom ANSI tag.
+		 * Custom tag strings are @em not parsed, so it can, in fact, be anything
+		 * 
+		 */
+		ANSITag bodyTag;
+	};
+	/**
+	 * @brief Logs at the custom level
+	 * 
+	 * @param config Config of the logging level (@see aurora::log::CustomLogLevelConfig)
+	 * @param formatString String to format against (e.g. `"Hello, my name is {}"`)
+	 * @param args Args to format with. Should match the number of fields in @p formatString
+	 */
+	template <typename ...Args>
+	static void custom(CustomLogLevelConfig const& config, std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+		IMPL_CHECK_STATES(config.logLevel)
+			log_impl(config, states, LogLevel::Error, formatString, std::forward<Args>(args)...);
 
 		return;
 	}
 
 private:
+	using ConfigOpt = std::optional<std::reference_wrapper<CustomLogLevelConfig const>>;
 	template <typename ...Args>
 	static void log_impl(
+		ConfigOpt const& customConfig,
 		LogStates const& states,
 		LogLevel logLevel,
-		std::format_string<Args...> formatString,
+		std::format_string<Args...> const& formatString,
 		Args&&... args
 	) noexcept {
 		auto string = logString(
+			customConfig,
 			logLevel,
 			std::format(formatString, std::forward<Args>(args)...)
 		);
@@ -233,6 +271,7 @@ private:
 	}
 
 	static std::string logString(
+		ConfigOpt const& customConfig,
 		LogLevel logLevel,
 		std::string&& formattedBody
 	) noexcept;

@@ -23,6 +23,15 @@ int main() {
 	log::info("[Project with a very long name] haii from Project with a very long name!");
 	log::warn("haii!");
 	log::error("haii!");
+	log::custom(
+		{
+			.logLevel=log::LogLevel::Debug,
+			.logLevelName="TRACE",
+			.headTag="\e[35m",
+			.bodyTag=log::LogLevel::Warn
+		},
+		"haii!"
+	);
 
 	return 0;
 }
@@ -34,9 +43,9 @@ int main() {
 
 # Features
 - `aurora::log`
-	- ANSI supported logging to 4 different levels (`aurora::log::debug`, `aurora::log::info`, `aurora::log::warn`, `aurora::log::error`)
+	- ANSI supported logging to 4 default different levels (`aurora::log::debug`, `aurora::log::info`, `aurora::log::warn`, `aurora::log::error`) + a fully customizable level (`aurora::log::custom`)
 	- Custom log source specification (e.g. `aurora::log::debug("[AURORA] Hello from Aurora!")` -> `...] DEBUG | [AURORA] | Hello from Aurora!`)
-	- An ability to configure some of the logging aspects
+	- Configuration of some of the logging aspects
 - `aurora::ThreadManager`
 	- An ability to add names to threads for better readability in logs
 - `aurora::TargetManager` **(NOTE: on some systems Aurora's file access failure reasons may not be accurate!)**

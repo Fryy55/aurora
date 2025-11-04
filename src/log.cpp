@@ -18,32 +18,80 @@ std::uint8_t log::s_maxSourceLength = 12u;
 bool log::s_logToStderr = true;
 
 
-std::string log::logString(
-	log::LogLevel logLevel,
-	std::string&& formattedBody
-) noexcept {
-	char const* hTag;
+log::LogStates log::statesForLevel(LogLevel logLevel) noexcept {
+	LogStates ret{};
+
 	switch (logLevel) {
 		case LogLevel::Debug:
-			hTag = "\e[30m";
+			if (s_logLevel == LogLevel::Debug)
+				ret.first = true;
+			if (s_fileLogLevel == LogLevel::Debug)
+				ret.second = true;
 			break;
 
 		case LogLevel::Info:
-			hTag = "\e[34m";
+			if (s_logLevel == LogLevel::Debug || s_logLevel == LogLevel::Info)
+				ret.first = true;
+			if (s_fileLogLevel == LogLevel::Debug || s_fileLogLevel == LogLevel::Info)
+				ret.second = true;
 			break;
 
 		case LogLevel::Warn:
-			hTag = "\e[33m";
+			if (s_logLevel != LogLevel::Error)
+				ret.first = true;
+			if (s_fileLogLevel != LogLevel::Error)
+				ret.second = true;
 			break;
 
-		case LogLevel::Error:
-			hTag = "\e[91m";
-			break;
-
+		case LogLevel::Error: [[fallthrough]];
 		default:
-			hTag = "\e[0m";
-			break;
+			ret = { true, true };
 	}
+
+	return ret;
+}
+
+std::string log::logString(
+	ConfigOpt const& customConfig,
+	log::LogLevel logLevel,
+	std::string&& formattedBody
+) noexcept {
+	constexpr auto hasLogLevel = [](CustomLogLevelConfig::ANSITag const& ansiTag) noexcept {
+		return std::holds_alternative<LogLevel>(ansiTag);
+	};
+	constexpr auto getLogLevel = [](CustomLogLevelConfig::ANSITag const& ansiTag) noexcept {
+		return std::get<LogLevel>(ansiTag);
+	};
+	constexpr auto getANSIString = [](CustomLogLevelConfig::ANSITag const& ansiTag) noexcept {
+		return std::get<std::string_view>(ansiTag);
+	};
+
+	auto hTag = [&logLevel, &customConfig, &hasLogLevel, &getLogLevel, &getANSIString]() -> std::string_view {
+		if (!customConfig || hasLogLevel(customConfig->get().headTag)) {
+			if (customConfig && hasLogLevel(customConfig->get().headTag))
+				logLevel = getLogLevel(customConfig->get().headTag);
+
+			switch (logLevel) {
+				case LogLevel::Debug:
+					return "\e[30m";
+
+				case LogLevel::Info:
+					return "\e[34m";
+
+				case LogLevel::Warn:
+					return "\e[33m";
+
+				case LogLevel::Error:
+					return "\e[91m";
+
+				default:
+					return "\e[0m";
+			}
+		}
+
+		// control gets here if a config is present and it's set to a custom tag
+		return getANSIString(customConfig->get().headTag);
+	}();
 
 	// check for a source
 	bool source = false;
@@ -86,7 +134,10 @@ std::string log::logString(
 			);
 		}(),
 		hTag, // h tag
-		[logLevel]() { // log level
+		[logLevel, &customConfig]() -> std::string_view { // log level
+			if (customConfig)
+				return customConfig->get().logLevelName;
+
 			switch (logLevel) {
 				case LogLevel::Debug:
 					return "DEBUG";
@@ -101,26 +152,34 @@ std::string log::logString(
 					return "ERROR";
 
 				default:
-					return "BLANK";
+					return "_____";
 			}
 		}(),
 		source ? // optional source specifier
 			std::format("\e[0;36m [{}]\e[90m |", limitStr(matches[1].str()))
 			:
 			"",
-		[logLevel]() { // b tag
-			switch (logLevel) {
-				case LogLevel::Warn:
-					return "\e[93m";
+		[&logLevel, &customConfig, &hasLogLevel, &getLogLevel, &getANSIString]() -> std::string_view { // b tag
+			if (!customConfig || hasLogLevel(customConfig->get().bodyTag)) {
+				if (customConfig && hasLogLevel(customConfig->get().bodyTag))
+					logLevel = getLogLevel(customConfig->get().bodyTag);
 
-				case LogLevel::Error:
-					return "\e[31m";
+				switch (logLevel) {
+					case LogLevel::Warn:
+						return "\e[93m";
 
-				case LogLevel::Debug: [[fallthrough]];
-				case LogLevel::Info: [[fallthrough]];
-				default:
-					return "\e[0m";
+					case LogLevel::Error:
+						return "\e[31m";
+
+					case LogLevel::Debug: [[fallthrough]];
+					case LogLevel::Info: [[fallthrough]];
+					default:
+						return "\e[0m";
+				}
 			}
+
+			// control gets here if a config is present and it's set to a custom tag
+			return getANSIString(customConfig->get().bodyTag);
 		}(),
 		source ? // body
 			matches[2].str()
