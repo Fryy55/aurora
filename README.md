@@ -6,6 +6,27 @@ A simple C++23 logger library, inspired by [Geode](https://github.com/geode-sdk/
 #include <aurora/aurora.hpp>
 
 
+namespace foo {
+
+template <typename ...Args>
+void trace(std::format_string<Args...> const& formatString, Args&&... args) noexcept {
+	using namespace aurora;
+
+	log::custom(
+		{
+			.logLevel=log::LogLevel::Debug,
+			.logLevelName="TRACE",
+			.headTag="\e[35m",
+			.bodyTag=log::LogLevel::Warn
+		},
+		formatString, std::forward<Args>(args)...
+	);
+
+	return;
+}
+
+}
+
 int main() {
 	using namespace aurora;
 
@@ -21,17 +42,9 @@ int main() {
 
 	log::debug("[Cool Project] haii from Cool Project!");
 	log::info("[Project with a very long name] haii from Project with a very long name!");
-	log::warn("haii!");
+	log::warn("haii {} #{}!", "User", 43);
 	log::error("haii!");
-	log::custom(
-		{
-			.logLevel=log::LogLevel::Debug,
-			.logLevelName="TRACE",
-			.headTag="\e[35m",
-			.bodyTag=log::LogLevel::Warn
-		},
-		"haii!"
-	);
+	foo::trace("haii {} #{}!", "User", 44);
 
 	return 0;
 }
