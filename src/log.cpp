@@ -104,16 +104,15 @@ std::string log::logString(
 	return std::format(
 		"{}" // h tag
 		"{}" // time
-		"\e[90m |" // separator
-		" \e[1;30m[{}]\e[0m" // thread
+		"\e[0m\e[90m |" // separator
+		" \e[1;30m[{}\e[0m\e[1;30m]\e[0m" // thread
 		" {}" // h tag
 		"{}" // log level
-		"\e[90m |" // separator
+		"\e[0m\e[90m |" // separator
 		"{}" // optional source specifier
-		"{}" // b tag
-		" {}" // body
-		"\e[0m" // reset tag
-		"\n", // newline
+		" \e[0m{}" // b tag
+		"{}" // body
+		"\e[0m\n", // newline
 
 		hTag, // h tag
 		[]() { // time
@@ -156,7 +155,7 @@ std::string log::logString(
 			}
 		}(),
 		source ? // optional source specifier
-			std::format("\e[0;36m [{}]\e[90m |", limitStr(matches[1].str()))
+			std::format(" \e[36m[{}\e[0m\e[36m]\e[90m |", limitStr(matches[1].str()))
 			:
 			"",
 		[&logLevel, &customConfig, &hasLogLevel, &getLogLevel, &getANSIString]() -> std::string_view { // b tag
@@ -174,7 +173,7 @@ std::string log::logString(
 					case LogLevel::Debug: [[fallthrough]];
 					case LogLevel::Info: [[fallthrough]];
 					default:
-						return "\e[0m";
+						return "";
 				}
 			}
 
