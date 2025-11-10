@@ -23,13 +23,14 @@ bool TargetManager::canOpenFile(std::string_view pathToAFile) const noexcept {
 
 	fs::path path(pathToAFile);
 
+	std::error_code err;
 	if (
 		auto dir = path.parent_path();
-		!fs::exists(dir) && !fs::create_directory(dir)
+		!fs::exists(dir, err) && !fs::create_directories(dir, err)
 	) {
 		log::warn(
-			"[AURORA] Failed to access directory '{}': {}.",
-			dir.string(), std::strerror(errno)
+			"[AURORA] Failed to access/create directory '{}': {}.",
+			dir.string(), err.message()
 		);
 		return false;
 	}
@@ -43,11 +44,11 @@ bool TargetManager::canOpenFile(std::string_view pathToAFile) const noexcept {
 		return false;
 	}
 	F.close();
-	if (!fs::remove(path)) {
+	if (!fs::remove(path, err)) {
 		log::error(
 			"[AURORA] Failed to remove file '{}': {}. "
 			"Unwanted traces may stay on your system.",
-			pathToAFile, std::strerror(errno)
+			pathToAFile, err.message()
 		);
 	}
 
