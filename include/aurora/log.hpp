@@ -63,8 +63,8 @@ public:
 	static void setFileLogLevel(LogLevel logLevel) noexcept { s_fileLogLevel = logLevel; }
 
 private:
-	static LogLevel s_logLevel;
-	static LogLevel s_fileLogLevel;
+	static inline LogLevel s_logLevel = LogLevel::Debug;
+	static inline LogLevel s_fileLogLevel = LogLevel::Info;
 
 public:
 	// Time locale
@@ -82,7 +82,7 @@ public:
 	static void set12hTimeEnabled(bool on) noexcept { s_use12hTime = on; }
 
 private:
-	static bool s_use12hTime;
+	static inline bool s_use12hTime = true;
 
 public:
 	// Max source length
@@ -102,7 +102,7 @@ public:
 	}
 
 private:
-	static std::uint8_t s_maxSourceLength;
+	static inline std::uint8_t s_maxSourceLength = 12u;
 
 public:
 	// Log to stderr
@@ -121,7 +121,7 @@ public:
 	static void setLogToStderrEnabled(bool on) noexcept { s_logToStderr = on; }
 
 private:
-	static bool s_logToStderr;
+	static inline bool s_logToStderr = true;
 
 
 // Logging functions

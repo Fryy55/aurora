@@ -7,17 +7,6 @@
 using namespace aurora;
 
 
-// Log level
-auto log::s_logLevel = log::LogLevel::Debug;
-auto log::s_fileLogLevel = log::LogLevel::Info;
-// Time locale
-bool log::s_use12hTime = false;
-// Max source length
-std::uint8_t log::s_maxSourceLength = 12u;
-// Log to stderr
-bool log::s_logToStderr = true;
-
-
 log::LogStates log::statesForLevel(LogLevel logLevel) noexcept {
 	LogStates ret{};
 
