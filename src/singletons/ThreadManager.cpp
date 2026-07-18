@@ -6,9 +6,9 @@ using namespace aurora;
 
 
 ThreadManager* ThreadManager::get() noexcept {
-	static ThreadManager instance;
+	static auto instance = new ThreadManager();
 
-	return &instance;
+	return instance;
 }
 
 

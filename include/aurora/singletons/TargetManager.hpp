@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_set>
+#include <flat_set>
 #include <string>
 #include <optional>
 #include <cstdint>
@@ -35,10 +35,10 @@ private:
 
 public:
 	/**
-	 * @brief An `std::unordered_set` of all currently active targets (files)
+	 * @brief An `std::flat_set` of all currently active targets (files)
 	 * 
 	 */
-	using Targets = std::unordered_set<std::string>;
+	using Targets = std::flat_set<std::string>;
 	/**
 	 * @brief Gets the current log targets (files) <em>by `const&`</em>
 	 * 

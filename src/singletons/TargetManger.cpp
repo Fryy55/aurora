@@ -12,9 +12,9 @@ using namespace aurora;
 
 
 TargetManager* TargetManager::get() noexcept {
-	static TargetManager instance;
+	static auto instance = new TargetManager();
 
-	return &instance;
+	return instance;
 }
 
 
