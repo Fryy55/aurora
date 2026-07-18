@@ -120,6 +120,7 @@ std::optional<std::string> TargetManager::logToDir(
 	std::string_view filename
 ) noexcept {
 	namespace fs = std::filesystem;
+	namespace ch = std::chrono;
 
 	fs::path dir(directory);
 
@@ -155,16 +156,25 @@ std::optional<std::string> TargetManager::logToDir(
 		}
 	}
 
+	auto tt = ch::system_clock::to_time_t(ch::system_clock::now());
+
+	std::tm localTime;
+
+	#if defined(_MSC_VER)
+		localtime_s(&localTime, &tt);
+	#else
+		localtime_r(&tt, &localTime);
+	#endif
+
+	std::stringstream stream;
+	stream << std::put_time(&localTime, "%F %H.%M.%OS");
+
 	auto target = (dir/std::format(
-		"{} {:%F %H.%M.%OS}.log",
-		filename,
-		std::chrono::zoned_time(
-			std::chrono::current_zone(),
-			std::chrono::system_clock::now()
-		)
+		"{} {}.log",
+		filename, stream.str()
 	)).string();
 
-	addLogTarget(target);
+	this->addLogTarget(target);
 
 	return std::move(target);
 }

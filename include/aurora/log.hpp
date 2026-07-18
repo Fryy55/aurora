@@ -2,6 +2,7 @@
 
 #include <aurora/singletons/TargetManager.hpp>
 
+#include <variant>
 #include <print>
 #include <iostream>
 #include <regex>

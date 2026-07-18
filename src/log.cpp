@@ -107,12 +107,23 @@ std::string log::logString(
 		[]() { // time
 			namespace ch = std::chrono;
 
-			ch::zoned_time time(ch::current_zone(), ch::system_clock::now());
+			auto tt = ch::system_clock::to_time_t(ch::system_clock::now());
 
-			return s_use12hTime ?
-				std::format("{:%r}", time)
-				:
-				std::format("{:%H:%M:%OS}", time);
+			std::tm localTime;
+
+			#if defined(_MSC_VER)
+				localtime_s(&localTime, &tt);
+			#else
+				localtime_r(&tt, &localTime);
+			#endif
+
+			std::stringstream stream;
+			stream << (s_use12hTime ?
+						std::put_time(&localTime, "%r")
+						:
+						std::put_time(&localTime, "%H:%M:%OS"));
+			
+			return stream.str();
 		}(),
 		[]() { // thread
 			auto thID = std::this_thread::get_id();
