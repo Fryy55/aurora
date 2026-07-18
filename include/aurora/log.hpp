@@ -64,8 +64,8 @@ public:
 	static void setFileLogLevel(LogLevel logLevel) noexcept { s_fileLogLevel = logLevel; }
 
 private:
-	static inline LogLevel s_logLevel = LogLevel::Debug;
-	static inline LogLevel s_fileLogLevel = LogLevel::Info;
+	static inline LogLevel& s_logLevel = *(new LogLevel(LogLevel::Debug));
+	static inline LogLevel& s_fileLogLevel = *(new LogLevel(LogLevel::Info));
 
 public:
 	// Time locale
@@ -83,7 +83,7 @@ public:
 	static void set12hTimeEnabled(bool on) noexcept { s_use12hTime = on; }
 
 private:
-	static inline bool s_use12hTime = true;
+	static inline bool& s_use12hTime = *(new bool(true));
 
 public:
 	// Max source length
@@ -103,7 +103,7 @@ public:
 	}
 
 private:
-	static inline std::uint8_t s_maxSourceLength = 12u;
+	static inline std::uint8_t& s_maxSourceLength = *(new std::uint8_t(12u));
 
 public:
 	// Log to stderr
@@ -122,7 +122,7 @@ public:
 	static void setLogToStderrEnabled(bool on) noexcept { s_logToStderr = on; }
 
 private:
-	static inline bool s_logToStderr = true;
+	static inline bool& s_logToStderr = *(new bool(true));
 
 
 // Logging functions
@@ -257,7 +257,7 @@ private:
 		if (states.first)
 			std::print(s_logToStderr ? std::cerr : std::cout, "{}", string);
 		if (states.second) {
-			static std::regex const ansiRegex(R"(\x1B\[[\d;]*m)");
+			static auto const& ansiRegex = *(new std::regex(R"(\x1B\[[\d;]*m)"));
 
 			auto fileString = std::regex_replace(string, ansiRegex, "");
 
