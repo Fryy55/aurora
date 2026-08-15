@@ -3,6 +3,7 @@
 #include <aurora/singletons/ThreadManager.hpp>
 
 #include <chrono>
+#include <iomanip>
 
 using namespace aurora;
 
