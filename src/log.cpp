@@ -85,7 +85,7 @@ std::string log::logString(
 
 	// check for a source
 	bool source = false;
-	static auto const& sourceRegex = *(new std::regex(R"(^\[(.*?)\] (.*))"));
+	static auto const& sourceRegex = *(new std::regex(R"(^\[(.*?)\] (.*))")); // NOLINT(bugprone-unhandled-exception-at-new)
 	std::smatch matches;
 
 	if (std::regex_search(formattedBody, matches, sourceRegex))

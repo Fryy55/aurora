@@ -12,7 +12,7 @@ using namespace aurora;
 
 
 TargetManager* TargetManager::get() noexcept {
-	static auto instance = new TargetManager();
+	static auto instance = new TargetManager(); // NOLINT(bugprone-unhandled-exception-at-new)
 
 	return instance;
 }

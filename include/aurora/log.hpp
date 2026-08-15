@@ -257,7 +257,7 @@ private:
 		if (states.first)
 			std::print(s_logToStderr ? std::cerr : std::cout, "{}", string);
 		if (states.second) {
-			static auto const& ansiRegex = *(new std::regex(R"(\x1B\[[\d;]*m)"));
+			static auto const& ansiRegex = *(new std::regex(R"(\x1B\[[\d;]*m)")); // NOLINT(bugprone-unhandled-exception-at-new)
 
 			auto fileString = std::regex_replace(string, ansiRegex, "");
 

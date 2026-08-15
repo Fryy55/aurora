@@ -6,7 +6,7 @@ using namespace aurora;
 
 
 ThreadManager* ThreadManager::get() noexcept {
-	static auto instance = new ThreadManager();
+	static auto instance = new ThreadManager(); // NOLINT(bugprone-unhandled-exception-at-new)
 
 	return instance;
 }
