@@ -83,7 +83,7 @@ public:
 	static void set12hTimeEnabled(bool on) noexcept { s_use12hTime = on; }
 
 private:
-	static inline bool s_use12hTime = true;
+	static inline bool s_use12hTime = false;
 
 public:
 	// Max source length
