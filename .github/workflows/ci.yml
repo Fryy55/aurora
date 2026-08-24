@@ -46,15 +46,36 @@ jobs:
 
 
       - name: Configure CMake
-        run: |
+        run: | #! SYNC WITH TESTS
           mkdir ./build
           cd ./build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="10.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="14.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
 
       - name: Build the test
         run: cmake --build ./build --config Release
 
 
-      - name: Run the test
-        if: ${{ runner.os != 'Windows' }}
-        run: ${{ case(runner.os == 'Windows', './build/Aurora.exe', './build/Aurora') }}
+      - name: Run the test (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        run: ./build/Aurora.exe
+
+      - name: Run the test (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: ./build/Aurora
+
+      - name: Upload the binary to test on older macOS
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-test
+          path: ./build/Aurora
+
+  test-macos:
+    name: Test Aurora on macOS
+    runs-on: macos-14 #! SYNC WITH CMAKE
+    needs: build-and-test
+
+    steps:
+      - name: Download the test binary
+        uses: actions/download-artifact@v8
+        with:
+          name: macos-test
