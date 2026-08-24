@@ -13,7 +13,7 @@ jobs:
       matrix:
         config:
         - name: Windows
-          os: windows-2022
+          os: windows-2025
 
         - name: Linux x64
           os: ubuntu-24.04
@@ -22,7 +22,7 @@ jobs:
           os: ubuntu-24.04-arm
 
         - name: macOS
-          os: macos-14
+          os: macos-15
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
