@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 #include <flat_set>
 #include <string>
 #include <optional>
