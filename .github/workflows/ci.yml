@@ -22,7 +22,7 @@ jobs:
           os: ubuntu-24.04-arm
 
         - name: macOS
-          os: macos-15
+          os: macos-latest
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -49,7 +49,7 @@ jobs:
         run: | #! SYNC WITH TESTS
           mkdir ./build
           cd ./build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="15.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="26.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
 
       - name: Build the test
         run: cmake --build ./build --config Release
@@ -79,7 +79,7 @@ jobs:
 
   test-macos:
     name: Test Aurora on macOS
-    runs-on: macos-15 #! SYNC WITH CMAKE
+    runs-on: macos-26 #! SYNC WITH CMAKE
     needs: build-and-test
 
     steps:
