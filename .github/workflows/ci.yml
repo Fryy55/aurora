@@ -1,4 +1,4 @@
-name: Build Qt App
+name: Build & Test Aurora
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
       matrix:
         config:
         - name: Windows
-          os: windows-latest
+          os: windows-2022
 
         - name: Linux x64
           os: ubuntu-24.04
@@ -49,7 +49,7 @@ jobs:
         run: |
           mkdir ./build
           cd ./build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="14.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="15.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
 
       - name: Build the test
         run: cmake --build ./build --config Release
