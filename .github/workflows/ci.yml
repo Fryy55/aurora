@@ -82,4 +82,4 @@ jobs:
           name: macos-test
 
       - name: Run the test
-        run: ./Aurora
+        run: ls; ./Aurora
