@@ -82,4 +82,6 @@ jobs:
           name: macos-test
 
       - name: Run the test
-        run: ls; ./Aurora
+        run: |
+          chmod +x ./Aurora
+          ./Aurora
