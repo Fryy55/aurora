@@ -22,7 +22,7 @@ jobs:
           os: ubuntu-24.04-arm
 
         - name: macOS
-          os: macos-latest
+          os: macos-15
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
