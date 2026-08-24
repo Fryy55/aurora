@@ -49,16 +49,12 @@ jobs:
         run: |
           mkdir ./build
           cd ./build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="13.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="14.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
 
       - name: Build the test
         run: cmake --build ./build --config Release
 
 
-      - name: Run the test (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        run: ./build/Aurora.exe
-
-      - name: Run the test (Linux & macOS)
+      - name: Run the test
         if: ${{ runner.os != 'Windows' }}
-        run: ./build/Aurora
+        run: ${{ case(runner.os == 'Windows', './build/Aurora.exe', './build/Aurora') }}
