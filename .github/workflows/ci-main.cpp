@@ -32,6 +32,9 @@ int main() {
 	ThreadManager::get()->addThread("Main");
 
 	log::debug("[Cool Project] haii from Cool Project!");
+
+	TargetManager::get()->logToDir("./aurora-test", "Aurora");
+
 	log::info("[Project with a very long name] haii from Project with a very long name!");
 	log::warn("haii {} #{}!", "User", 43);
 

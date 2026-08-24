@@ -57,11 +57,18 @@ jobs:
 
       - name: Run the test (Windows)
         if: ${{ runner.os == 'Windows' }}
-        run: ./build/Aurora.exe
+        shell: pwsh
+        run: |
+          cd ./build
+          ./Aurora.exe
+          cat ./aurora-test/*.log
 
       - name: Run the test (Linux)
         if: ${{ runner.os == 'Linux' }}
-        run: ./build/Aurora
+        run: |
+          cd ./build
+          ./Aurora
+          cat ./aurora-test/*.log
 
       - name: Upload the binary to test on older macOS
         if: ${{ runner.os == 'macOS' }}
@@ -85,3 +92,4 @@ jobs:
         run: |
           chmod +x ./Aurora
           ./Aurora
+          cat ./aurora-test/*.log
