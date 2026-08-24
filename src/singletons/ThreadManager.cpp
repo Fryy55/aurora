@@ -13,21 +13,31 @@ ThreadManager* ThreadManager::get() noexcept {
 
 
 bool ThreadManager::addThread(std::string_view threadName) noexcept {
+	auto id = std::this_thread::get_id();
+	bool idAlreadySaved = false;
+
+	if (m_dbID_S.contains(id))
+		idAlreadySaved = true;
+
 	auto [iter, inserted] = m_strDB.emplace(threadName);
 	if (!inserted) {
 		log::warn(
 			"[AURORA] Failed to name thread {}; thread named '{}' already exists.",
-			std::this_thread::get_id(), threadName
+			id, threadName
 		);
 		return false;
 	}
 
-	auto id = std::this_thread::get_id();
+	if (idAlreadySaved)
+		this->removeThread(id);
 
 	m_dbID_S.emplace(id, *iter);
 	m_dbS_ID.emplace(*iter, id);
 
-	log::debug("[AURORA] Thread {} saved as '{}'.", id, threadName);
+	if (idAlreadySaved)
+		log::debug("[AURORA] Thread {} renamed to '{}'.", id, threadName);
+	else
+		log::debug("[AURORA] Thread {} saved as '{}'.", id, threadName);
 
 	return true;
 }

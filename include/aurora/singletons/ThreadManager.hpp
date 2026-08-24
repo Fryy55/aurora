@@ -3,7 +3,7 @@
 #include <string_view>
 #include <thread>
 #include <flat_map>
-#include <flat_set>
+#include <unordered_set>
 #include <string>
 
 
@@ -34,7 +34,7 @@ private:
 
 public:
 	/**
-	 * @brief Adds the @em calling @em thread to the database with a provided name
+	 * @brief Adds the @em calling @em thread to the database with a provided name. Calling the function if a thread is already named renames it
 	 * 
 	 * @param threadName Name for the thread
 	 * @return Boolean, indicating successful addition
@@ -78,7 +78,7 @@ private:
 	// Fields
 	std::flat_map<std::thread::id, std::string_view> m_dbID_S{};
 	std::flat_map<std::string_view, std::thread::id> m_dbS_ID{};
-	std::flat_set<std::string> m_strDB{};
+	std::unordered_set<std::string> m_strDB{};
 };
 
 } // namespace aurora

@@ -34,6 +34,9 @@ int main() {
 	log::debug("[Cool Project] haii from Cool Project!");
 	log::info("[Project with a very long name] haii from Project with a very long name!");
 	log::warn("haii {} #{}!", "User", 43);
+
+	ThreadManager::get()->addThread("Renamed Main");
+
 	log::error("haii!");
 	foo::trace("haii {} #{}!", "User", 44);
 
