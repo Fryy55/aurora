@@ -4,7 +4,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <cstring>
 #include <algorithm>
 #include <chrono>
 
@@ -39,7 +38,7 @@ bool TargetManager::canOpenFile(std::string_view pathToAFile) const noexcept {
 	if (!F.is_open()) {
 		log::warn(
 			"[AURORA] Failed to add log target '{}': {}.",
-			pathToAFile, std::strerror(errno)
+			pathToAFile, std::generic_category().message(errno)
 		);
 		return false;
 	}
@@ -150,7 +149,7 @@ std::optional<std::string> TargetManager::logToDir(
 				log::error(
 					"[AURORA] Failed to remove file '{}': {}. "
 					"Unwanted traces may stay on your system.",
-					dirVec[i].path().filename().string(), std::strerror(errno)
+					dirVec[i].path().filename().string(), std::generic_category().message(errno)
 				);
 			}
 		}

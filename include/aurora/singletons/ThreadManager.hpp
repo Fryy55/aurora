@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string_view>
 #include <thread>
 #include <flat_map>
 #include <flat_set>
