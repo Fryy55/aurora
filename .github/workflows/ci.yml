@@ -1,0 +1,64 @@
+name: Build Qt App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - name: Windows
+          os: windows-latest
+
+        - name: Linux x64
+          os: ubuntu-24.04
+
+        - name: Linux ARM64
+          os: ubuntu-24.04-arm
+
+        - name: macOS
+          os: macos-14
+
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+
+      - name: Install new LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: 21
+
+
+      # platform specific deps
+      - name: Install new GCC
+        if: ${{ runner.os == 'Linux' }}
+        uses: egor-tensin/setup-gcc@v2
+        with:
+          version: 15
+
+
+      - name: Configure CMake
+        run: |
+          mkdir ./build
+          cd ./build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_DEPLOYMENT_TARGET="13.0" -DAURORA_CI_TEST=ON -S .. -B . -G Ninja
+
+      - name: Build the test
+        run: cmake --build ./build --config Release
+
+
+      - name: Run the test (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        run: ./build/Aurora.exe
+
+      - name: Run the test (Linux & macOS)
+        if: ${{ runner.os != 'Windows' }}
+        run: ./build/Aurora

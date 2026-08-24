@@ -12,6 +12,12 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 if (PROJECT_IS_TOP_LEVEL)
     add_executable(${PROJECT_NAME} ${SOURCES})
+
+    if (AURORA_CI_TEST)
+        message(STATUS "Adding CI tests")
+
+        target_sources(${PROJECT_NAME} PRIVATE .github/workflows/ci-main.cpp)
+    endif()
 else()
     add_library(${PROJECT_NAME} STATIC ${SOURCES})
 endif()
